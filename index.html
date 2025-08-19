@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenDesk Pro - Professional Productivity Suite</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* Glassmorphism containers */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .glass-header {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="2"/></g></svg>');
+        }
+
+        .auth-form {
+            width: 100%;
+            max-width: 440px;
+            padding: 3rem;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-form::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            border-radius: 26px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .auth-form:hover::before {
+            opacity: 1;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .auth-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary);
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .auth-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .auth-switch a:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            padding: 2rem;
+            border-radius: 24px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .header-left h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--success), var(--warning));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .user-info {
+            color: var(--white);
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .user-role {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .widget {
+            padding: 2rem;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .widget::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+        }
+
+        .widget:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .widget-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .widget-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        /* Task Manager */
+        .task-widget .widget-icon { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+
+        .task-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .task-input input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .task-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-add {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .task-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .task-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .task-list::-webkit-scrollbar-track {
+            background: var(--light);
+            border-radius: 3px;
+        }
+
+        .task-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background: var(--light);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .task-item:hover {
+            background: #e2e8f0;
+            transform: translateX(8px);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            border-left-color: var(--success);
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+        }
+
+        .task-text {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 0.75rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Notes Widget */
+        .notes-widget .widget-icon { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+
+        .notes-input textarea {
+            width: 100%;
+            height: 120px;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .notes-input textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .note-item {
+            background: var(--light);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            border-left: 4px solid #8b5cf6;
+            transition: all 0.3s ease;
+        }
+
+        .note-item:hover {
+            background: #e2e8f0;
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .note-date {
+            font-size: 0.85rem;
+            color: var(--secondary);
+        }
+
+        .note-content {
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* Timer Widget */
+        .timer-widget .widget-icon { background: linear-gradient(135deg, var(--warning), #d97706); }
+
+        .timer-display {
+            text-align: center;
+            font-size: 4rem;
+            font-weight: 800;
+            margin: 2rem 0;
+            color: var(--primary);
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-timer {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-start { background: var(--success); color: var(--white); }
+        .btn-pause { background: var(--warning); color: var(--white); }
+        .btn-reset { background: var(--danger); color: var(--white); }
+
+        .timer-presets {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* Calculator Widget */
+        .calc-widget .widget-icon { background: linear-gradient(135deg, var(--secondary), #475569); }
+
+        .calculator {
+            max-width: 350px;
+            margin: 0 auto;
+        }
+
+        .calc-display {
+            width: 100%;
+            height: 80px;
+            font-size: 2rem;
+            text-align: right;
+            padding: 0 1rem;
+            margin-bottom: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--light);
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-weight: 600;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .calc-btn {
+            height: 60px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calc-btn.number {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .calc-btn.operator {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .calc-btn.equals {
+            background: var(--success);
+            color: var(--white);
+            grid-row: span 2;
+        }
+
+        .calc-btn.zero {
+            grid-column: span 2;
+        }
+
+        .calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Quick Links Widget */
+        .links-widget .widget-icon { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .quick-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 1rem;
+            background: var(--light);
+            border-radius: 16px;
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .quick-link i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+        }
+
+        .quick-link:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
+        }
+
+        .quick-link:hover i {
+            color: var(--white);
+        }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-left h1 {
+                font-size: 2rem;
+            }
+
+            .timer-display {
+                font-size: 3rem;
+            }
+
+            .auth-form {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .widget {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calc-buttons {
+                gap: 0.5rem;
+            }
+            
+            .calc-btn {
+                height: 50px;
+                font-size: 1rem;
+            }
+            
+            .timer-controls {
+                flex-direction: column;
+            }
+            
+            .quick-links {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div id="loginForm" class="auth-container">
+        <div class="auth-form glass-card">
+            <div class="auth-header">
+                <h1>ZenDesk Pro</h1>
+                <p>Welcome back to your productivity suite</p>
+            </div>
+            <form id="loginFormElement">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" required placeholder="Enter your email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" required placeholder="Enter your password">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+                <div id="loginError" class="error-message hidden"></div>
+            </form>
+            <div class="auth-switch">
+                Don't have an account? <a id="showSignup">Create one here</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signupForm" class="auth-container hidden">
+        <div class="auth-form glass-card">
+            <div class="auth-header">
+                <h1>Join ZenDesk Pro</h1>
+                <p>Create your professional productivity account</p>
+            </div>
+            <form id="signupFormElement">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="signupName" required placeholder="Enter your full name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email Address</label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="signupEmail" required placeholder="Enter your email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupPassword" required placeholder="Create a password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" required placeholder="Confirm your password">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                <div id="signupError" class="error-message hidden"></div>
+            </form>
+            <div class="auth-switch">
+                Already have an account? <a id="showLogin">Sign in here</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <div class="container">
+            <div class="header glass-header">
+                <div class="header-left">
+                    <h1>ZenDesk Pro</h1>
+                    <div class="header-subtitle">Professional Productivity Suite</div>
+                </div>
+                <div class="header-right">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Welcome!</div>
+                        <div class="user-role">Premium User</div>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Task Manager -->
+                <div class="widget glass-card task-widget">
+                    <div class="widget-header">
+                        <div class="widget-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="widget-title">Task Manager</div>
+                    </div>
+                    <div class="task-input">
+                        <input type="text" id="taskInput" placeholder="Add a new task...">
+                        <button class="btn-add" id="addTaskBtn">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <div class="task-list" id="taskList">
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-list"></i>
+                            <p>No tasks yet. Add your first task above!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="widget glass-card notes-widget">
+                    <div class="widget-header">
+                        <div class="widget-icon">
+                            <i class="fas fa-sticky-note"></i>
+                        </div>
+                        <div class="widget-title">Quick Notes</div>
+                    </div>
+                    <div class="notes-input">
+                        <textarea id="noteInput" placeholder="Write your notes here..."></textarea>
+                        <button class="btn-primary" id="addNoteBtn" style="margin-top: 1rem;">
+                            <i class="fas fa-save"></i> Save Note
+                        </button>
+                    </div>
+                    <div class="notes-list" id="notesList">
+                        <div class="empty-state">
+                            <i class="fas fa-file-alt"></i>
+                            <p>No notes saved. Write your first note above!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pomodoro Timer -->
+                <div class="widget glass-card timer-widget">
+                    <div class="widget-header">
+                        <div class="widget-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="widget-title">Pomodoro Timer</div>
+                    </div>
+                    <div class="timer-display" id="timerDisplay">25:00</div>
+                    <div class="timer-controls">
+                        <button class="btn-timer btn-start" id="startTimer">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <button class="btn-timer btn-pause" id="pauseTimer">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button class="btn-timer btn-reset" id="resetTimer">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                    <div class="timer-presets">
+                        <button class="preset-btn" data-minutes="25">25 min</button>
+                        <button class="preset-btn" data-minutes="15">15 min</button>
+                        <button class="preset-btn" data-minutes="5">5 min</button>
+                        <button class="preset-btn" data-minutes="45">45 min</button>
+                    </div>
+                </div>
+
+                <!-- Calculator -->
+                <div class="widget glass-card calc-widget">
+                    <div class="widget-header">
+                        <div class="widget-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <div class="widget-title">Calculator</div>
+                    </div>
+                    <div class="calculator">
+                        <input type="text" class="calc-display" id="calcDisplay" readonly value="0">
+                        <div class="calc-buttons">
+                            <button class="calc-btn operator" onclick="clearCalc()">C</button>
+                            <button class="calc-btn operator" onclick="deleteLast()">⌫</button>
+                            <button class="calc-btn operator" onclick="appendToDisplay('/')">/</button>
+                            <button class="calc-btn operator" onclick="appendToDisplay('*')">×</button>
+                            
+                            <button class="calc-btn number" onclick="appendToDisplay('7')">7</button>
+                            <button class="calc-btn number" onclick="appendToDisplay('8')">8</button>
+                            <button class="calc-btn number" onclick="appendToDisplay('9')">9</button>
+                            <button class="calc-btn operator" onclick="appendToDisplay('-')">-</button>
+                            
+                            <button class="calc-btn number" onclick="appendToDisplay('4')">4</button>
+                            <button class="calc-btn number" onclick="appendToDisplay('5')">5</button>
+                            <button class="calc-btn number" onclick="appendToDisplay('6')">6</button>
+                            <button class="calc-btn operator" onclick="appendToDisplay('+')">+</button>
+                            
+                            <button class="calc-btn number" onclick="appendToDisplay('1')">1</button>
+                            <button class="calc-btn number" onclick="appendToDisplay('2')">2</button>
+                            <button class="calc-btn number" onclick="appendToDisplay('3')">3</button>
+                            <button class="calc-btn equals" onclick="calculate()" rowspan="2">=</button>
+                            
+                            <button class="calc-btn number zero" onclick="appendToDisplay('0')">0</button>
+                            <button class="calc-btn number" onclick="appendToDisplay('.')">.</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="widget glass-card links-widget">
+                    <div class="widget-header">
+                        <div class="widget-icon">
+                            <i class="fas fa-external-link-alt"></i>
+                        </div>
+                        <div class="widget-title">Quick Links</div>
+                    </div>
+                    <div class="quick-links">
+                        <a href="https://gmail.com" target="_blank" class="quick-link">
+                            <i class="fas fa-envelope"></i>
+                            Gmail
+                        </a>
+                        <a href="https://calendar.google.com" target="_blank" class="quick-link">
+                            <i class="fas fa-calendar"></i>
+                            Calendar
+                        </a>
+                        <a href="https://drive.google.com" target="_blank" class="quick-link">
+                            <i class="fas fa-cloud"></i>
+                            Drive
+                        </a>
+                        <a href="https://github.com" target="_blank" class="quick-link">
+                            <i class="fab fa-github"></i>
+                            GitHub
+                        </a>
+                        <a href="https://stackoverflow.com" target="_blank" class="quick-link">
+                            <i class="fab fa-stack-overflow"></i>
+                            Stack Overflow
+                        </a>
+                        <a href="https://youtube.com" target="_blank" class="quick-link">
+                            <i class="fab fa-youtube"></i>
+                            YouTube
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application state
+        let currentUser = null;
+        let tasks = [];
+        let notes = [];
+        let timerInterval = null;
+        let timerSeconds = 25 * 60; // 25 minutes
+        let isTimerRunning = false;
+
+        // DOM elements
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const dashboard = document.getElementById('dashboard');
+
+        // Authentication
+        document.getElementById('showSignup').addEventListener('click', () => {
+            loginForm.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+        });
+
+        document.getElementById('showLogin').addEventListener('click', () => {
+            signupForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+        });
+
+        document.getElementById('loginFormElement').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (email && password) {
+                login(email);
+            } else {
+                showError('loginError', 'Please fill in all fields');
+            }
+        });
+
+        document.getElementById('signupFormElement').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showError('signupError', 'Passwords do not match');
+                return;
+            }
+            
+            if (name && email && password) {
+                signup(name, email);
+            } else {
+                showError('signupError', 'Please fill in all fields');
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+
+        function login(email) {
+            currentUser = { email };
+            showDashboard();
+            updateUserInfo();
+        }
+
+        function signup(name, email) {
+            currentUser = { name, email };
+            showDashboard();
+            updateUserInfo();
+        }
+
+        function logout() {
+            currentUser = null;
+            tasks = [];
+            notes = [];
+            clearTimer();
+            dashboard.classList.remove('active');
+            loginForm.classList.remove('hidden');
+            signupForm.classList.add('hidden');
+        }
+
+        function showDashboard() {
+            loginForm.classList.add('hidden');
+            signupForm.classList.add('hidden');
+            dashboard.classList.add('active');
+        }
+
+        function updateUserInfo() {
+            const userName = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
+            
+            if (currentUser.name) {
+                userName.textContent = currentUser.name;
+                userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+            } else {
+                userName.textContent = currentUser.email;
+                userAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
+            }
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+            setTimeout(() => {
+                errorElement.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Task Manager
+        document.getElementById('addTaskBtn').addEventListener('click', addTask);
+        document.getElementById('taskInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTask();
+        });
+
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskText = taskInput.value.trim();
+            
+            if (!taskText) return;
+            
+            const task = {
+                id: Date.now(),
+                text: taskText,
+                completed: false
+            };
+            
+            tasks.push(task);
+            taskInput.value = '';
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            
+            if (tasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>No tasks yet. Add your first task above!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            taskList.innerHTML = tasks.map(task => `
+                <div class="task-item ${task.completed ? 'completed' : ''}">
+                    <div class="task-text">${task.text}</div>
+                    <div class="task-actions">
+                        <button class="btn-sm btn-success" onclick="toggleTask(${task.id})">
+                            <i class="fas fa-${task.completed ? 'undo' : 'check'}"></i>
+                        </button>
+                        <button class="btn-sm btn-danger" onclick="deleteTask(${task.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                renderTasks();
+            }
+        }
+
+        function deleteTask(taskId) {
+            tasks = tasks.filter(t => t.id !== taskId);
+            renderTasks();
+        }
+
+        // Notes
+        document.getElementById('addNoteBtn').addEventListener('click', addNote);
+
+        function addNote() {
+            const noteInput = document.getElementById('noteInput');
+            const noteText = noteInput.value.trim();
+            
+            if (!noteText) return;
+            
+            const note = {
+                id: Date.now(),
+                text: noteText,
+                date: new Date().toLocaleDateString()
+            };
+            
+            notes.push(note);
+            noteInput.value = '';
+            renderNotes();
+        }
+
+        function renderNotes() {
+            const notesList = document.getElementById('notesList');
+            
+            if (notes.length === 0) {
+                notesList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-file-alt"></i>
+                        <p>No notes saved. Write your first note above!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            notesList.innerHTML = notes.map(note => `
+                <div class="note-item">
+                    <div class="note-header">
+                        <div class="note-date">${note.date}</div>
+                        <button class="btn-sm btn-danger" onclick="deleteNote(${note.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="note-content">${note.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function deleteNote(noteId) {
+            notes = notes.filter(n => n.id !== noteId);
+            renderNotes();
+        }
+
+        // Timer
+        document.getElementById('startTimer').addEventListener('click', startTimer);
+        document.getElementById('pauseTimer').addEventListener('click', pauseTimer);
+        document.getElementById('resetTimer').addEventListener('click', resetTimer);
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const minutes = parseInt(e.target.dataset.minutes);
+                setTimer(minutes * 60);
+            });
+        });
+
+        function startTimer() {
+            if (!isTimerRunning) {
+                isTimerRunning = true;
+                timerInterval = setInterval(() => {
+                    timerSeconds--;
+                    updateTimerDisplay();
+                    
+                    if (timerSeconds <= 0) {
+                        pauseTimer();
+                        alert('Time\'s up!');
+                    }
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            isTimerRunning = false;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = 25 * 60;
+            updateTimerDisplay();
+        }
+
+        function setTimer(seconds) {
+            pauseTimer();
+            timerSeconds = seconds;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timerSeconds / 60);
+            const seconds = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function clearTimer() {
+            pauseTimer();
+            timerSeconds = 25 * 60;
+            updateTimerDisplay();
+        }
+
+        // Calculator
+        let calcDisplay = document.getElementById('calcDisplay');
+        let calcValue = '0';
+        let operator = null;
+        let waitingForOperand = false;
+
+        function updateCalcDisplay() {
+            calcDisplay.value = calcValue;
+        }
+
+        function appendToDisplay(value) {
+            if (waitingForOperand) {
+                calcValue = value;
+                waitingForOperand = false;
+            } else {
+                calcValue = calcValue === '0' ? value : calcValue + value;
+            }
+            updateCalcDisplay();
+        }
+
+        function clearCalc() {
+            calcValue = '0';
+            operator = null;
+            waitingForOperand = false;
+            updateCalcDisplay();
+        }
+
+        function deleteLast() {
+            calcValue = calcValue.length > 1 ? calcValue.slice(0, -1) : '0';
+            updateCalcDisplay();
+        }
+
+        function calculate() {
+            try {
+                // Replace × with * for evaluation
+                const expression = calcValue.replace(/×/g, '*');
+                const result = eval(expression);
+                calcValue = result.toString();
+                updateCalcDisplay();
+                waitingForOperand = true;
+            } catch (error) {
+                calcValue = 'Error';
+                updateCalcDisplay();
+                setTimeout(() => {
+                    calcValue = '0';
+                    updateCalcDisplay();
+                }, 2000);
+            }
+        }
+
+        // Initialize
+        updateTimerDisplay();
+    </script>
+</body>
+</html>

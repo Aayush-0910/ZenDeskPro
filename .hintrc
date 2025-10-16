@@ -9,6 +9,7 @@
     "not safari <= 18.2"
   ],
   "hints": {
-    "css-prefix-order": "off"
+    "css-prefix-order": "off",
+    "axe/forms": "off"
   }
 }

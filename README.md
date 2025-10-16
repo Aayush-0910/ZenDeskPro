@@ -1,4 +1,4 @@
-# ZenDesk Pro // Aurora Interface
+# ZenDesk Pro 
 
 A futuristic, cyberpunk-themed personal dashboard application with an animated aurora background and a "glassmorphism" aesthetic. This project is built with vanilla HTML, CSS, and JavaScript, focusing on modern UI design and dynamic, client-side functionality.
 

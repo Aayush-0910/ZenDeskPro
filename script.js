@@ -116,6 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
             signupError: document.getElementById('signupError'),
             signupNameInput: document.getElementById('signupName'),
             signupAdditionalFields: document.getElementById('signup-additional-fields'),
+            chatbotMessages: document.getElementById('chatbotMessages'),
+            chatbotInput: document.getElementById('chatbotInput'),
+            sendChatBtn: document.getElementById('sendChatBtn'),
         },
 
         init() {
@@ -139,6 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.signupNameInput.addEventListener('focus', () => {
                 this.elements.signupAdditionalFields.classList.add('fields-visible');
             });
+            this.elements.sendChatBtn.addEventListener('click', this.handleChat.bind(this));
+            this.elements.chatbotInput.addEventListener('keypress', (e) => e.key === 'Enter' && this.handleChat());
         },
 
         // IMPORTANT: This is a mock user system. Storing plain text passwords
@@ -257,6 +262,63 @@ document.addEventListener('DOMContentLoaded', () => {
             this.fetchAllApis();
             this.updateDateTime();
             this.updateTimerDisplay();
+        },
+
+
+
+        handleChat() {
+            const userMessage = this.elements.chatbotInput.value.trim();
+            if (!userMessage) return;
+
+            this.addMessageToChat(userMessage, 'user');
+            this.elements.chatbotInput.value = '';
+
+            this.getGeminiResponse(userMessage);
+        },
+
+        addMessageToChat(message, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', `${sender}-message`);
+            messageElement.textContent = message;
+            this.elements.chatbotMessages.appendChild(messageElement);
+            this.elements.chatbotMessages.scrollTop = this.elements.chatbotMessages.scrollHeight;
+        },
+
+        async getGeminiResponse(prompt) {
+            this.addMessageToChat("Thinking...", 'bot');
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: prompt })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const botResponse = data.message;
+
+                // Remove the "Thinking..." message
+                const thinkingMessage = this.elements.chatbotMessages.lastChild;
+                if (thinkingMessage && thinkingMessage.textContent === "Thinking...") {
+                    this.elements.chatbotMessages.removeChild(thinkingMessage);
+                }
+
+                this.addMessageToChat(botResponse, 'bot');
+
+            } catch (error) {
+                console.error("Error fetching Gemini response:", error);
+                const thinkingMessage = this.elements.chatbotMessages.lastChild;
+                if (thinkingMessage && thinkingMessage.textContent === "Thinking...") {
+                    this.elements.chatbotMessages.removeChild(thinkingMessage);
+                }
+                this.addMessageToChat("Sorry, I encountered an error. Please check the console for details.", 'bot');
+            }
         },
 
         updateUserInfo() {

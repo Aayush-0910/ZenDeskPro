@@ -1,0 +1,27 @@
+{
+  "name": "zendeskpro",
+  "version": "1.0.0",
+  "description": "A futuristic, cyberpunk-themed personal dashboard application with an animated aurora background and a \"glassmorphism\" aesthetic. This project is built with vanilla HTML, CSS, and JavaScript, focusing on modern UI design and dynamic, client-side functionality.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aayush-0910/ZenDeskPro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Aayush-0910/ZenDeskPro/issues"
+  },
+  "homepage": "https://github.com/Aayush-0910/ZenDeskPro#readme",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "body-parser": "^2.2.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0"
+  }
+}

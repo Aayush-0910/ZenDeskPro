@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZenDesk Pro </title>
+    <title>ZenDesk Pro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -23,10 +23,11 @@
         <div class="auth-form">
             <div class="auth-header"><h1>ZenDesk Pro</h1><p>Please sign in to continue</p></div>
             <form id="loginFormElement">
-                <div class="form-group"><label for="loginEmail">Email Address</label><div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="loginEmail" required placeholder="your@email.com"></div></div>
                 <div class="form-group">
-                    <label for="loginPassword">Password</label>
-                    <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="loginPassword" required placeholder="Your password"></div>
+                    <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="loginEmail" required placeholder="your@email.com"><label for="loginEmail">Email Address</label></div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="loginPassword" required placeholder="Your password"><label for="loginPassword">Password</label></div>
                     <p class="error-message" id="loginError"></p>
                 </div>
                 <button type="submit" class="btn-primary"><i class="fas fa-arrow-right"></i> Sign In</button>
@@ -39,15 +40,13 @@
             <div class="auth-header"><h1>Create Account</h1><p>Get started with your new dashboard.</p></div>
             <form id="signupFormElement">
                 <div class="form-group">
-                    <label for="signupName">Full Name</label>
-                    <div class="input-group"><i class="fas fa-user"></i><input type="text" id="signupName" required placeholder="Your full name"></div>
+                    <div class="input-group"><i class="fas fa-user"></i><input type="text" id="signupName" required placeholder="Your full name"><label for="signupName">Full Name</label></div>
                 </div>
                 <div id="signup-additional-fields" class="signup-hidden-fields">
-                    <div class="form-group"><label for="signupEmail">Email Address</label><div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="signupEmail" required placeholder="your@email.com"></div></div>
-                    <div class="form-group"><label for="signupPassword">Create Password</label><div class="input-group"><i class="fas fa-lock"></i><input type="password" id="signupPassword" required placeholder="Create a strong password"></div></div>
+                    <div class="form-group"><div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="signupEmail" required placeholder="your@email.com"><label for="signupEmail">Email Address</label></div></div>
+                    <div class="form-group"><div class="input-group"><i class="fas fa-lock"></i><input type="password" id="signupPassword" required placeholder="Create a strong password"><label for="signupPassword">Create Password</label></div></div>
                     <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="confirmPassword" required placeholder="Confirm your password"></div>
+                        <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="confirmPassword" required placeholder="Confirm your password"><label for="confirmPassword">Confirm Password</label></div>
                         <p class="error-message" id="signupError"></p>
                     </div>
                     <button type="submit" class="btn-primary"><i class="fas fa-user-plus"></i> Create Account</button>
@@ -64,57 +63,57 @@
                 <div class="header-right">
                     <div class="user-avatar" id="userAvatar">U</div>
                     <div class="user-info"><div class="user-name" id="userName">Welcome!</div><div class="date-time" id="date-time"></div></div>
-                    <button class="logout-btn" id="logoutBtn" title="Logout"><i class="fas fa-power-off"></i> Logout</button>
+                    <button class="logout-btn" id="logoutBtn" aria-label="Logout"><i class="fas fa-power-off"></i> Logout</button>
                 </div>
             </header>
             <main class="dashboard-grid">
-                <div class="widget task-widget col-span-2 row-span-2">
+                <section class="widget task-widget col-span-2 row-span-2">
                     <div class="widget-header"><div class="widget-icon"><i class="fas fa-tasks"></i></div><h2 class="widget-title">Task Manager</h2></div>
                     <div class="widget-content">
                         <div class="task-input">
                             <input type="text" id="taskInput" placeholder="Add a new task...">
-                            <select id="taskPriority">
+                            <select id="taskPriority" aria-label="Task Priority">
                                 <option value="low">Low Priority</option>
                                 <option value="medium" selected>Medium Priority</option>
                                 <option value="high">High Priority</option>
                             </select>
-                            <button class="btn-add" id="addTaskBtn" title="Add Task"><i class="fas fa-plus"></i> Add</button>
+                            <button class="btn-add" id="addTaskBtn" aria-label="Add Task"><i class="fas fa-plus"></i> Add</button>
                         </div>
                         <div class="task-list" id="taskList"></div>
                     </div>
-                </div>
-                <div class="widget notes-widget row-span-2">
+                </section>
+                <section class="widget notes-widget row-span-2">
                      <div class="widget-header"><div class="widget-icon"><i class="fas fa-sticky-note"></i></div><h2 class="widget-title">Quick Notes</h2></div>
                     <div class="widget-content">
                         <div class="notes-input">
-                            <textarea id="noteInput" placeholder="Jot down a quick note..."></textarea>
+                            <textarea id="noteInput" placeholder="Jot down a quick note..." aria-label="New Note"></textarea>
                             <button class="btn-primary" id="addNoteBtn"><i class="fas fa-save"></i> Save Note</button>
                         </div>
                         <div class="notes-list" id="notesList"></div>
                     </div>
-                </div>
-                <div class="widget timer-widget">
+                </section>
+                <section class="widget timer-widget">
                     <div class="widget-header"><div class="widget-icon"><i class="fas fa-clock"></i></div><h2 class="widget-title">Timer</h2></div>
                     <div class="widget-content center-content">
                         <div class="timer-display" id="timerDisplay">25:00</div>
                         <div class="timer-controls">
-                            <button class="btn-timer" id="startTimer" title="Start"><i class="fas fa-play"></i></button>
-                            <button class="btn-timer" id="pauseTimer" title="Pause"><i class="fas fa-pause"></i></button>
-                            <button class="btn-timer" id="resetTimer" title="Reset"><i class="fas fa-redo"></i></button>
+                            <button class="btn-timer" id="startTimer" aria-label="Start Timer"><i class="fas fa-play"></i></button>
+                            <button class="btn-timer" id="pauseTimer" aria-label="Pause Timer"><i class="fas fa-pause"></i></button>
+                            <button class="btn-timer" id="resetTimer" aria-label="Reset Timer"><i class="fas fa-redo"></i></button>
                         </div>
                     </div>
-                </div>
-                 <div class="widget weather-widget">
+                </section>
+                 <section class="widget weather-widget">
                     <div class="widget-header"><div class="widget-icon"><i class="fas fa-cloud-sun"></i></div><h2 class="widget-title">Weather</h2></div>
                     <div class="widget-content center-content">
                         <div class="weather-info">
-                            <i class="fas fa-cloud-sun" id="weatherIcon"></i>
+                            <i class="fas fa-cloud-sun" id="weatherIcon" aria-hidden="true"></i>
                             <div id="weatherTemp">--°C</div>
                             <div id="weatherLocation">Loading...</div>
                         </div>
                     </div>
-                </div>
-                <div class="widget quote-widget">
+                </section>
+                <section class="widget quote-widget">
                      <div class="widget-header"><div class="widget-icon"><i class="fas fa-lightbulb"></i></div><h2 class="widget-title">Quote of the Day</h2></div>
                      <div class="widget-content center-content">
                          <div class="quote-content">
@@ -122,15 +121,15 @@
                              <p id="quoteAuthor"></p>
                          </div>
                     </div>
-                </div>
-                <div class="widget links-widget">
+                </section>
+                <section class="widget links-widget">
                     <div class="widget-header"><div class="widget-icon"><i class="fas fa-link"></i></div><h2 class="widget-title">Quick Links</h2></div>
                     <div class="widget-content">
                          <div class="quick-links">
-                             <a href="https://gmail.com" target="_blank" rel="noopener" class="quick-link"><i class="fas fa-envelope"></i> Gmail</a>
-                             <a href="https://github.com" target="_blank" rel="noopener" class="quick-link"><i class="fab fa-github"></i> GitHub</a>
-                             <a href="https://stackoverflow.com" target="_blank" rel="noopener" class="quick-link"><i class="fab fa-stack-overflow"></i> Stack</a>
-                             <a href="https://youtube.com" target="_blank" rel="noopener" class="quick-link"><i class="fab fa-youtube"></i> YouTube</a>
+                             <a href="https://gmail.com" target="_blank" rel="noopener" class="quick-link"><i class="fas fa-envelope" aria-hidden="true"></i> Gmail</a>
+                             <a href="https://github.com" target="_blank" rel="noopener" class="quick-link"><i class="fab fa-github" aria-hidden="true"></i> GitHub</a>
+                             <a href="https://stackoverflow.com" target="_blank" rel="noopener" class="quick-link"><i class="fab fa-stack-overflow" aria-hidden="true"></i> Stack</a>
+                             <a href="https://youtube.com" target="_blank" rel="noopener" class="quick-link"><i class="fab fa-youtube" aria-hidden="true"></i> YouTube</a>
                          </div>
                     </div>
                 </div>

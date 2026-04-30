@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenDesk Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="aurora-canvas"></canvas>
+
+    <div id="notification" class="notification-container hidden">
+        <div class="notification-box">
+            <p id="notificationMessage"></p>
+        </div>
+    </div>
+
+    <div id="loginForm" class="auth-container hidden">
+        <div class="auth-form">
+            <div class="auth-header"><h1>ZenDesk Pro</h1><p>Please sign in to continue</p></div>
+            <form id="loginFormElement">
+                <div class="form-group">
+                    <div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="loginEmail" required placeholder="your@email.com"><label for="loginEmail">Email Address</label></div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="loginPassword" required placeholder="Your password"><label for="loginPassword">Password</label></div>
+                    <p class="error-message" id="loginError"></p>
+                </div>
+                <button type="submit" class="btn-primary"><i class="fas fa-arrow-right"></i> Sign In</button>
+            </form>
+            <div class="auth-switch">No account? <a id="showSignup">Create one</a></div>
+        </div>
+    </div>
+    <div id="signupForm" class="auth-container hidden">
+        <div class="auth-form">
+            <div class="auth-header"><h1>Create Account</h1><p>Get started with your new dashboard.</p></div>
+            <form id="signupFormElement">
+                <div class="form-group">
+                    <div class="input-group"><i class="fas fa-user"></i><input type="text" id="signupName" required placeholder="Your full name"><label for="signupName">Full Name</label></div>
+                </div>
+                <div id="signup-additional-fields" class="signup-hidden-fields">
+                    <div class="form-group"><div class="input-group"><i class="fas fa-envelope"></i><input type="email" id="signupEmail" required placeholder="your@email.com"><label for="signupEmail">Email Address</label></div></div>
+                    <div class="form-group"><div class="input-group"><i class="fas fa-lock"></i><input type="password" id="signupPassword" required placeholder="Create a strong password"><label for="signupPassword">Create Password</label></div></div>
+                    <div class="form-group">
+                        <div class="input-group"><i class="fas fa-lock"></i><input type="password" id="confirmPassword" required placeholder="Confirm your password"><label for="confirmPassword">Confirm Password</label></div>
+                        <p class="error-message" id="signupError"></p>
+                    </div>
+                    <button type="submit" class="btn-primary"><i class="fas fa-user-plus"></i> Create Account</button>
+                </div>
+            </form>
+            <div class="auth-switch">Already have an account? <a id="showLogin">Sign In here</a></div>
+        </div>
+    </div>
+
+    <div id="dashboard" class="dashboard">
+        <div class="container">
+            <header class="header">
+                <div class="header-left"><h1>ZenDesk Pro</h1><div class="header-subtitle" id="greeting">Loading...</div></div>
+                <div class="header-right">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info"><div class="user-name" id="userName">Welcome!</div><div class="date-time" id="date-time"></div></div>
+                    <button class="logout-btn" id="logoutBtn" aria-label="Logout"><i class="fas fa-power-off"></i> Logout</button>
+                </div>
+            </header>
+            <main class="dashboard-grid">
+                <section class="widget task-widget col-span-2 row-span-2">
+                    <div class="widget-header"><div class="widget-icon"><i class="fas fa-tasks"></i></div><h2 class="widget-title">Task Manager</h2></div>
+                    <div class="widget-content">
+                        <div class="task-input">
+                            <input type="text" id="taskInput" placeholder="Add a new task...">
+                            <select id="taskPriority" aria-label="Task Priority">
+                                <option value="low">Low Priority</option>
+                                <option value="medium" selected>Medium Priority</option>
+                                <option value="high">High Priority</option>
+                            </select>
+                            <button class="btn-add" id="addTaskBtn" aria-label="Add Task"><i class="fas fa-plus"></i> Add</button>
+                        </div>
+                        <div class="task-list" id="taskList"></div>
+                    </div>
+                </section>
+                <section class="widget notes-widget row-span-2">
+                     <div class="widget-header"><div class="widget-icon"><i class="fas fa-sticky-note"></i></div><h2 class="widget-title">Quick Notes</h2></div>
+                    <div class="widget-content">
+                        <div class="notes-input">
+                            <textarea id="noteInput" placeholder="Jot down a quick note..." aria-label="New Note"></textarea>
+                            <button class="btn-primary" id="addNoteBtn"><i class="fas fa-save"></i> Save Note</button>
+                        </div>
+                        <div class="notes-list" id="notesList"></div>
+                    </div>
+                </section>
+                <section class="widget timer-widget">
+                    <div class="widget-header"><div class="widget-icon"><i class="fas fa-clock"></i></div><h2 class="widget-title">Timer</h2></div>
+                    <div class="widget-content center-content">
+                        <div class="timer-display" id="timerDisplay">25:00</div>
+                        <div class="timer-controls">
+                            <button class="btn-timer" id="startTimer" aria-label="Start Timer"><i class="fas fa-play"></i></button>
+                            <button class="btn-timer" id="pauseTimer" aria-label="Pause Timer"><i class="fas fa-pause"></i></button>
+                            <button class="btn-timer" id="resetTimer" aria-label="Reset Timer"><i class="fas fa-redo"></i></button>
+                        </div>
+                    </div>
+                </section>
+                 <section class="widget weather-widget">
+                    <div class="widget-header"><div class="widget-icon"><i class="fas fa-cloud-sun"></i></div><h2 class="widget-title">Weather</h2></div>
+                    <div class="widget-content center-content">
+                        <div class="weather-info">
+                            <i class="fas fa-cloud-sun" id="weatherIcon" aria-hidden="true"></i>
+                            <div id="weatherTemp">--°C</div>
+                            <div id="weatherLocation">Loading...</div>
+                        </div>
+                    </div>
+                </section>
+                <section class="widget quote-widget">
+                     <div class="widget-header"><div class="widget-icon"><i class="fas fa-lightbulb"></i></div><h2 class="widget-title">Quote of the Day</h2></div>
+                     <div class="widget-content center-content">
+                         <div class="quote-content">
+                             <p id="quoteText">"Loading..."</p>
+                             <p id="quoteAuthor"></p>
+                         </div>
+                    </div>
+                </section>
+                <section class="widget links-widget">
+                    <div class="widget-header"><div class="widget-icon"><i class="fas fa-link"></i></div><h2 class="widget-title">Quick Links</h2></div>
+                    <div class="widget-content">
+                         <div class="quick-links">
+                             <a href="https://gmail.com" target="_blank" rel="noopener" class="quick-link"><i class="fas fa-envelope" aria-hidden="true"></i> Gmail</a>
+                             <a href="https://github.com" target="_blank" rel="noopener" class="quick-link"><i class="fab fa-github" aria-hidden="true"></i> GitHub</a>
+                             <a href="https://stackoverflow.com" target="_blank" rel="noopener" class="quick-link"><i class="fab fa-stack-overflow" aria-hidden="true"></i> Stack</a>
+                             <a href="https://youtube.com" target="_blank" rel="noopener" class="quick-link"><i class="fab fa-youtube" aria-hidden="true"></i> YouTube</a>
+                         </div>
+                    </div>
+                </div>
+                <div class="widget chatbot-widget col-span-2 row-span-2">
+                    <div class="widget-header">
+                        <div class="widget-icon"><i class="fas fa-robot"></i></div>
+                        <h2 class="widget-title">AI Assistant</h2>
+                    </div>
+                    <div class="widget-content">
+                        <div class="chatbot-messages" id="chatbotMessages"></div>
+                        <div class="chatbot-input">
+                            <button class="btn-voice" id="voiceBtn" title="Voice Command"><i class="fas fa-microphone"></i></button>
+                            <input type="text" id="chatbotInput" placeholder="Ask Gemini anything...">
+                            <button class="btn-add" id="sendChatBtn" title="Send"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>

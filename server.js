@@ -13,7 +13,7 @@ app.post('/chat', async (req, res) => {
     const { message, history } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
-    if (!apiKey || apiKey === 'AIzaSyDBNVaJKPdKs9MbZYMx5z38vPQsNnHQ4S0') {
+    if (!apiKey || apiKey === '') {
         return res.status(500).json({ error: 'API key not configured. Please add your GEMINI_API_KEY to the .env file.' });
     }
 

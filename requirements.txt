@@ -1,0 +1,5 @@
+fastapi[all]
+httpx
+python-dotenv
+google-auth
+aiosmtplib

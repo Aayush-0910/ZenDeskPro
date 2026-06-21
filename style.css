@@ -123,38 +123,29 @@ body::after {
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-            text-shadow: none;
-        }
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 30px var(--primary-accent);
-        }
-    
-        .auth-switch { text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); color: var(--text-secondary); }
-    
-        .auth-switch a {
-    
-            color: var(--primary-accent);
-    
-            text-decoration: none;
-    
-            font-weight: 600;
-    
-            transition: all 0.3s ease;
-    
-            cursor: pointer;
-    
-        }
-    
-        .auth-switch a:hover {
-    
-            filter: brightness(1.2);
-    
-            text-shadow: 0 0 5px var(--primary-accent);
-    
-        }
-    
-        
+    text-shadow: none;
+}
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px var(--primary-accent);
+}
+
+.auth-switch { text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border); color: var(--text-secondary); }
+
+.auth-switch a {
+    color: var(--primary-accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.auth-switch a:hover {
+    filter: brightness(1.2);
+    text-shadow: 0 0 5px var(--primary-accent);
+}
+
+
     
         .dashboard { display: none; height: 100vh; overflow: hidden; }
 .dashboard.active { display: flex; flex-direction: column; animation: fadeIn 1s ease-out; }
@@ -428,5 +419,28 @@ body::after {
     font-size: 0.9rem;
     margin-top: 0.75rem;
     text-align: center;
-    min-height: 1em; /* Prevents layout shift */
+    min-height: 1em;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--glass-border);
+}
+
+#google-login-btn,
+#google-signup-btn {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.5rem;
 }

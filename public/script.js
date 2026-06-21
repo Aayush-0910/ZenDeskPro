@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.addEventListener('gsi-loaded', () => this.renderGoogleButtons(), { once: true });
                 }
             } catch (e) {
-                console.error('Failed to init Google Sign-In:', e);
+                console.error('Failed to init Google Sign-In:', e.message || e);
             }
         },
 

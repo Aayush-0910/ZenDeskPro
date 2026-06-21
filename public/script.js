@@ -82,13 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
             dateTimeInterval: null,
             timerSeconds: 1500,
             isTimerRunning: false,
-<<<<<<< Updated upstream
-=======
             chatHistory: [],
             isListening: false,
             isSpeaking: false,
             googleClientId: null,
->>>>>>> Stashed changes
         },
 
         elements: {
@@ -392,9 +389,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessageToChat(message, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', `${sender}-message`);
-<<<<<<< Updated upstream
-            messageElement.textContent = message;
-=======
 
             let displayMessage = message;
             const jsonPart = message.match(/```json\n[\s\S]*?\n```/);
@@ -403,7 +397,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             messageElement.textContent = displayMessage;
->>>>>>> Stashed changes
             this.elements.chatbotMessages.appendChild(messageElement);
             this.elements.chatbotMessages.scrollTop = this.elements.chatbotMessages.scrollHeight;
         },
@@ -626,8 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
         },
 
-<<<<<<< Updated upstream
-=======
+
         // --- Voice Service ---
         toggleVoice() {
             if (this.state.isListening) {
@@ -692,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.speechSynthesis.speak(utterance);
         },
 
->>>>>>> Stashed changes
+
         renderAll() {
             this.renderTasks();
             this.renderNotes();

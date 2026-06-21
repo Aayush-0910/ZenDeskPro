@@ -1,15 +1,9 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "main.py", "use": "@vercel/python" }
-  ],
-  "routes": [
-    { "src": "/config",           "dest": "main.py" },
-    { "src": "/chat",             "dest": "main.py" },
-    { "src": "/verify",           "dest": "main.py" },
-    { "src": "/auth/(.*)",        "dest": "main.py" },
-    { "src": "/api/(.*)",         "dest": "main.py" },
-    { "src": "/(.*\\.(js|css|png|ico|svg|webp|woff2?))", "dest": "/$1" },
-    { "src": "/(.*)",             "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/config",                "destination": "/api/index" },
+    { "source": "/chat",                  "destination": "/api/index" },
+    { "source": "/verify",                "destination": "/api/index" },
+    { "source": "/auth/google",           "destination": "/api/index" },
+    { "source": "/api/send-confirmation", "destination": "/api/index" }
   ]
 }

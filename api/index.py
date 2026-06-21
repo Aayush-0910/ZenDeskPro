@@ -16,14 +16,22 @@ import httpx
 import jwt
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 load_dotenv()
 
 JWT_SECRET = os.getenv("JWT_SECRET", os.urandom(32).hex())
+FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 
 app = FastAPI(title="ZenDesk Pro")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_URL, "http://localhost:3000"] if FRONTEND_URL else ["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # ── Models ────────────────────────────────────────────────────────────────────
@@ -121,6 +129,7 @@ def _build_email_html(name: str, verify_url: str) -> str:
 
 def _verify_page(email: str) -> str:
     safe_email = json.dumps(email)
+    redirect_target = f"{FRONTEND_URL}/?verified=1" if FRONTEND_URL else "/?verified=1"
     return f"""<!DOCTYPE html>
 <html>
 <head><title>Email Verified</title>
@@ -133,7 +142,7 @@ try {{
   var u = (s.users || []).find(function(u) {{ return u.email === {safe_email}; }});
   if (u) {{ u.verified = true; localStorage.setItem('zenDeskProState_v3', JSON.stringify(s)); }}
 }} catch(e) {{}}
-window.location.href = '/?verified=1';
+window.location.href = '{redirect_target}';
 </script>
 </body>
 </html>"""

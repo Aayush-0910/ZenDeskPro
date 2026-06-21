@@ -26,11 +26,15 @@ JWT_SECRET = os.getenv("JWT_SECRET", os.urandom(32).hex())
 FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 
 app = FastAPI(title="ZenDesk Pro")
+_origins = (
+    [FRONTEND_URL, "http://localhost:3000"] if FRONTEND_URL
+    else ["https://fabulous-sfogliatella-cb7b2b.netlify.app", "http://localhost:3000"]
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL, "http://localhost:3000"] if FRONTEND_URL else ["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_origins,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 

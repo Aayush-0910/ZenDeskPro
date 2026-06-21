@@ -1,15 +1,19 @@
 {
   "version": 2,
   "builds": [
-    { "src": "main.py", "use": "@vercel/python" }
+    { "src": "main.py",    "use": "@vercel/python" },
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "style.css",  "use": "@vercel/static" },
+    { "src": "script.js",  "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/config",           "dest": "main.py" },
-    { "src": "/chat",             "dest": "main.py" },
-    { "src": "/verify",           "dest": "main.py" },
-    { "src": "/auth/(.*)",        "dest": "main.py" },
-    { "src": "/api/(.*)",         "dest": "main.py" },
-    { "src": "/(.*\\.(js|css|png|ico|svg|webp|woff2?))", "dest": "/$1" },
-    { "src": "/(.*)",             "dest": "/index.html" }
+    { "src": "/config",                "dest": "main.py" },
+    { "src": "/chat",                  "dest": "main.py" },
+    { "src": "/verify",                "dest": "main.py" },
+    { "src": "/auth/google",           "dest": "main.py" },
+    { "src": "/api/send-confirmation", "dest": "main.py" },
+    { "src": "/style\\.css",           "dest": "/style.css" },
+    { "src": "/script\\.js",           "dest": "/script.js" },
+    { "src": "/(.*)",                  "dest": "/index.html" }
   ]
 }

@@ -14,8 +14,6 @@ import jwt
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
-from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
 from pydantic import BaseModel
 
 load_dotenv()
@@ -173,13 +171,20 @@ async def google_auth(body: GoogleAuthRequest):
     if not client_id:
         raise HTTPException(status_code=500, detail="GOOGLE_CLIENT_ID not configured in .env")
     try:
-        info = id_token.verify_oauth2_token(
-            body.credential,
-            google_requests.Request(),
-            client_id,
-        )
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                "https://oauth2.googleapis.com/tokeninfo",
+                params={"id_token": body.credential},
+            )
+        if resp.status_code != 200:
+            raise ValueError("Token rejected by Google")
+        info = resp.json()
+        if "error_description" in info:
+            raise ValueError(info["error_description"])
+        if info.get("aud") != client_id:
+            raise ValueError("Token audience mismatch")
         return {
-            "name": info["name"],
+            "name": info.get("name", ""),
             "email": info["email"],
             "picture": info.get("picture"),
             "googleId": info["sub"],

@@ -1,4 +1,5 @@
 const BACKEND_URL = 'https://zen-desk-pro-xp6v.vercel.app';
+const GOOGLE_CLIENT_ID = '947597922943-icg9cju1p1ns1gpt7254s8arkhubdjcu.apps.googleusercontent.com';
 
 /**
  * ZenDesk Pro - Aurora Interface Script
@@ -163,20 +164,12 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.chatbotInput.addEventListener('keypress', (e) => e.key === 'Enter' && this.handleChat());
         },
 
-        async initGoogleSignIn() {
-            try {
-                const res = await fetch(`${BACKEND_URL}/config`);
-                const { googleClientId } = await res.json();
-                if (!googleClientId) return;
-                this.state.googleClientId = googleClientId;
-
-                if (typeof google !== 'undefined') {
-                    this.renderGoogleButtons();
-                } else {
-                    window.addEventListener('gsi-loaded', () => this.renderGoogleButtons(), { once: true });
-                }
-            } catch (e) {
-                console.error('Failed to init Google Sign-In:', e.message || e);
+        initGoogleSignIn() {
+            this.state.googleClientId = GOOGLE_CLIENT_ID;
+            if (typeof google !== 'undefined') {
+                this.renderGoogleButtons();
+            } else {
+                window.addEventListener('gsi-loaded', () => this.renderGoogleButtons(), { once: true });
             }
         },
 

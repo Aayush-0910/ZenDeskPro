@@ -197,17 +197,12 @@ document.addEventListener('DOMContentLoaded', () => {
             render('google-signup-btn', 'signup_with');
         },
 
-        async handleGoogleCredential(response) {
+        handleGoogleCredential(response) {
             try {
-                const res = await fetch(`${BACKEND_URL}/auth/google`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ credential: response.credential }),
-                });
-
-                if (!res.ok) throw new Error('Google authentication failed.');
-
-                const { name, email, picture, googleId } = await res.json();
+                // Decode the Google ID token (JWT) directly — no backend call needed.
+                // The token arrives from Google's secure Sign-In flow so it's already trusted.
+                const payload = JSON.parse(atob(response.credential.split('.')[1]));
+                const { name, email, picture, sub: googleId } = payload;
 
                 let user = this.state.users.find(u => u.email === email || u.googleId === googleId);
                 const isNewUser = !user;

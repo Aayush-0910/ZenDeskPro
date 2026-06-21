@@ -1,9 +1,16 @@
 {
-  "rewrites": [
-    { "source": "/config",                "destination": "/api/index" },
-    { "source": "/chat",                  "destination": "/api/index" },
-    { "source": "/verify",                "destination": "/api/index" },
-    { "source": "/auth/google",           "destination": "/api/index" },
-    { "source": "/api/send-confirmation", "destination": "/api/index" }
+  "outputDirectory": "public",
+  "builds": [
+    { "src": "api/index.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/config",                "dest": "/api/index.py" },
+    { "src": "/chat",                  "dest": "/api/index.py" },
+    { "src": "/verify",                "dest": "/api/index.py" },
+    { "src": "/auth/google",           "dest": "/api/index.py" },
+    { "src": "/api/send-confirmation", "dest": "/api/index.py" },
+    { "src": "/style\\.css",           "dest": "/style.css" },
+    { "src": "/script\\.js",           "dest": "/script.js" },
+    { "src": "/(.*)",                  "dest": "/index.html" }
   ]
 }

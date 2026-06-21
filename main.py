@@ -2,18 +2,18 @@ from __future__ import annotations
 
 import json
 import os
-import secrets
 import time
+from datetime import datetime, timedelta, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Any, Optional
 
 import aiosmtplib
 import httpx
+import jwt
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from pydantic import BaseModel
@@ -21,11 +21,10 @@ from pydantic import BaseModel
 load_dotenv()
 
 PORT = int(os.getenv("PORT", 3000))
+# Must be set in Vercel env vars — random fallback only for local dev
+JWT_SECRET = os.getenv("JWT_SECRET", os.urandom(32).hex())
 
 app = FastAPI(title="ZenDesk Pro")
-
-# In-memory token store: token -> { email, name, created_at }
-_pending_verifications: dict[str, dict] = {}
 
 
 # ── Models ────────────────────────────────────────────────────────────────────
@@ -40,6 +39,22 @@ class ConfirmationRequest(BaseModel):
 
 class GoogleAuthRequest(BaseModel):
     credential: str
+
+
+# ── JWT token helpers (stateless — no server-side storage needed) ─────────────
+
+def _create_verify_token(email: str, name: str) -> str:
+    payload = {
+        "email": email,
+        "name": name,
+        "purpose": "email_verification",
+        "exp": datetime.now(timezone.utc) + timedelta(hours=24),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+
+
+def _decode_verify_token(token: str) -> dict:
+    return jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
 
 
 # ── Email helpers ─────────────────────────────────────────────────────────────
@@ -85,11 +100,11 @@ def _build_email_html(name: str, verify_url: str) -> str:
         <div class="greeting">Welcome aboard, NAME_PLACEHOLDER!</div>
         <p class="text">Your account has been created. Click the button below to verify your email and access your dashboard.</p>
         <ul class="features">
-          <li><span class="dot"></span><div><span class="feat-label">Task Manager</span> &#8212;Organize and prioritize your daily tasks</div></li>
-          <li><span class="dot"></span><div><span class="feat-label">Quick Notes</span> &#8212;Capture ideas before they slip away</div></li>
-          <li><span class="dot"></span><div><span class="feat-label">Pomodoro Timer</span> &#8212;Stay in deep focus with timed sessions</div></li>
-          <li><span class="dot"></span><div><span class="feat-label">AI Assistant</span> &#8212;Powered by Gemini, manages your dashboard by voice or text</div></li>
-          <li><span class="dot"></span><div><span class="feat-label">Weather + Quotes</span> &#8212;Start every session informed and motivated</div></li>
+          <li><span class="dot"></span><div><span class="feat-label">Task Manager</span> - Organize and prioritize your daily tasks</div></li>
+          <li><span class="dot"></span><div><span class="feat-label">Quick Notes</span> - Capture ideas before they slip away</div></li>
+          <li><span class="dot"></span><div><span class="feat-label">Pomodoro Timer</span> - Stay in deep focus with timed sessions</div></li>
+          <li><span class="dot"></span><div><span class="feat-label">AI Assistant</span> - Powered by Gemini, manages your dashboard by voice or text</div></li>
+          <li><span class="dot"></span><div><span class="feat-label">Weather + Quotes</span> - Start every session informed and motivated</div></li>
         </ul>
         <div class="cta">
           <a href="VERIFY_URL_PLACEHOLDER" class="btn">Verify Email &amp; Sign In</a>
@@ -174,7 +189,7 @@ async def google_auth(body: GoogleAuthRequest):
 
 
 @app.post("/api/send-confirmation")
-async def send_confirmation(body: ConfirmationRequest):
+async def send_confirmation(body: ConfirmationRequest, request: Request):
     email_user = os.getenv("EMAIL_USER")
     email_pass = os.getenv("EMAIL_PASS")
     if not email_user or not email_pass:
@@ -183,14 +198,9 @@ async def send_confirmation(body: ConfirmationRequest):
             detail="Email service not configured. Add EMAIL_USER and EMAIL_PASS to .env",
         )
 
-    token = secrets.token_hex(32)
-    _pending_verifications[token] = {
-        "email": body.email,
-        "name": body.name,
-        "created_at": time.time(),
-    }
-
-    verify_url = f"http://localhost:{PORT}/verify?token={token}"
+    token = _create_verify_token(body.email, body.name)
+    base_url = str(request.base_url).rstrip("/")
+    verify_url = f"{base_url}/verify?token={token}"
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = "Verify your ZenDesk Pro account"
@@ -210,22 +220,21 @@ async def send_confirmation(body: ConfirmationRequest):
         print(f"Verification email sent -> {body.email}")
         return {"success": True}
     except Exception as e:
-        _pending_verifications.pop(token, None)
         raise HTTPException(status_code=500, detail=f"Failed to send email: {e}")
 
 
 @app.get("/verify", response_class=HTMLResponse)
 async def verify_email(token: str = Query(...)):
-    data = _pending_verifications.get(token)
-    if not data:
-        return _error_page("This verification link is invalid or has already been used.")
-
-    if time.time() - data["created_at"] > 86400:  # 24 hours
-        _pending_verifications.pop(token, None)
+    try:
+        payload = _decode_verify_token(token)
+        email = payload.get("email")
+        if not email or payload.get("purpose") != "email_verification":
+            raise ValueError("Invalid token payload")
+        return _verify_page(email)
+    except jwt.ExpiredSignatureError:
         return _error_page("This verification link has expired. Please sign up again.")
-
-    _pending_verifications.pop(token, None)
-    return _verify_page(data["email"])
+    except Exception:
+        return _error_page("This verification link is invalid or has already been used.")
 
 
 @app.post("/chat")
@@ -260,10 +269,7 @@ async def chat(body: ChatRequest):
             raise HTTPException(status_code=502, detail=f"AI communication error: {e}")
 
 
-# Static files - must be mounted last so API routes take priority
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
-
-
+# Local dev only - Vercel handles the server itself
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=PORT)

@@ -3,3 +3,4 @@ httpx
 python-dotenv
 google-auth
 aiosmtplib
+PyJWT

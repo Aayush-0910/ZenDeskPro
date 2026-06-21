@@ -77,8 +77,16 @@ document.addEventListener('DOMContentLoaded', () => {
             users: [],
             activeUserEmail: null,
             timerInterval: null,
+            dateTimeInterval: null,
             timerSeconds: 1500,
             isTimerRunning: false,
+<<<<<<< Updated upstream
+=======
+            chatHistory: [],
+            isListening: false,
+            isSpeaking: false,
+            googleClientId: null,
+>>>>>>> Stashed changes
         },
 
         elements: {
@@ -116,12 +124,25 @@ document.addEventListener('DOMContentLoaded', () => {
             signupError: document.getElementById('signupError'),
             signupNameInput: document.getElementById('signupName'),
             signupAdditionalFields: document.getElementById('signup-additional-fields'),
+            chatbotMessages: document.getElementById('chatbotMessages'),
+            chatbotInput: document.getElementById('chatbotInput'),
+            sendChatBtn: document.getElementById('sendChatBtn'),
         },
 
         init() {
             this.loadState();
             this.bindEvents();
-            this.switchForm(true); // Always show login form on start
+            this.switchForm(true);
+            this.initGoogleSignIn();
+            this.checkVerificationRedirect();
+        },
+
+        checkVerificationRedirect() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('verified') === '1') {
+                history.replaceState(null, '', '/');
+                this.showNotification('Email verified! You can now sign in.', 4000);
+            }
         },
 
         bindEvents() {
@@ -139,6 +160,80 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.signupNameInput.addEventListener('focus', () => {
                 this.elements.signupAdditionalFields.classList.add('fields-visible');
             });
+            this.elements.sendChatBtn.addEventListener('click', this.handleChat.bind(this));
+            this.elements.chatbotInput.addEventListener('keypress', (e) => e.key === 'Enter' && this.handleChat());
+        },
+
+        async initGoogleSignIn() {
+            try {
+                const res = await fetch('/config');
+                const { googleClientId } = await res.json();
+                if (!googleClientId) return;
+                this.state.googleClientId = googleClientId;
+
+                if (typeof google !== 'undefined') {
+                    this.renderGoogleButtons();
+                } else {
+                    window.addEventListener('gsi-loaded', () => this.renderGoogleButtons(), { once: true });
+                }
+            } catch (e) {
+                console.error('Failed to init Google Sign-In:', e);
+            }
+        },
+
+        renderGoogleButtons() {
+            if (!this.state.googleClientId || typeof google === 'undefined') return;
+
+            google.accounts.id.initialize({
+                client_id: this.state.googleClientId,
+                callback: this.handleGoogleCredential.bind(this),
+            });
+
+            const render = (id, text) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    google.accounts.id.renderButton(el, {
+                        theme: 'filled_black',
+                        size: 'large',
+                        width: 360,
+                        text,
+                    });
+                }
+            };
+
+            render('google-login-btn', 'signin_with');
+            render('google-signup-btn', 'signup_with');
+        },
+
+        async handleGoogleCredential(response) {
+            try {
+                const res = await fetch('/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential }),
+                });
+
+                if (!res.ok) throw new Error('Google authentication failed.');
+
+                const { name, email, picture, googleId } = await res.json();
+
+                let user = this.state.users.find(u => u.email === email || u.googleId === googleId);
+                const isNewUser = !user;
+                if (user) {
+                    user.googleId = googleId;
+                    user.picture = picture;
+                    user.verified = true;
+                } else {
+                    user = { name, email, googleId, picture, verified: true, tasks: [], notes: [] };
+                    this.state.users.push(user);
+                }
+                this.saveState();
+                if (isNewUser) this.sendConfirmationEmail(name, email);
+                this.login(user);
+            } catch (err) {
+                console.error('Google login error:', err);
+                this.showNotification('Google Sign-In failed. Please try again.');
+            }
         },
 
         // IMPORTANT: This is a mock user system. Storing plain text passwords
@@ -192,15 +287,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            if (!user.password && user.googleId) {
+                this.elements.loginError.textContent = 'This account uses Google Sign-In. Please use the Google button below.';
+                return;
+            }
+
             if (user.password !== password) {
                 this.elements.loginError.textContent = 'Incorrect password. Please try again.';
+                return;
+            }
+
+            if (user.verified === false) {
+                this.elements.loginError.textContent = 'Please verify your email before signing in. Check your inbox.';
                 return;
             }
 
             this.login(user);
         },
 
-        handleSignup(e) {
+        async handleSignup(e) {
             e.preventDefault();
             this.elements.signupError.textContent = '';
             const name = document.getElementById('signupName').value;
@@ -222,14 +327,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            this.state.users.push({ name, email, password, tasks: [], notes: [] });
+            this.state.users.push({ name, email, password, verified: false, tasks: [], notes: [] });
             this.saveState();
 
+            this.sendConfirmationEmail(name, email);
+
             this.elements.signupForm.classList.add('hidden');
-            this.showNotification('Signup successful! Please log in.', 3000)
-                .then(() => {
-                    this.switchForm(true); // Show login form after notification
-                });
+            this.showNotification('Account created! Check your email to verify before signing in.', 4000)
+                .then(() => this.switchForm(true));
+        },
+
+        sendConfirmationEmail(name, email) {
+            fetch('/api/send-confirmation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email }),
+            }).catch(err => console.warn('Confirmation email could not be sent:', err));
         },
 
         login(user) {
@@ -240,6 +353,9 @@ document.addEventListener('DOMContentLoaded', () => {
         logout() {
             this.state.activeUserEmail = null;
             this.clearTimer();
+            clearInterval(this.state.dateTimeInterval);
+            this.state.dateTimeInterval = null;
+            window.speechSynthesis.cancel();
             this.elements.dashboard.classList.remove('active');
             this.switchForm(true);
         },
@@ -259,21 +375,99 @@ document.addEventListener('DOMContentLoaded', () => {
             this.updateTimerDisplay();
         },
 
+
+
+        handleChat() {
+            const userMessage = this.elements.chatbotInput.value.trim();
+            if (!userMessage) return;
+
+            this.addMessageToChat(userMessage, 'user');
+            this.elements.chatbotInput.value = '';
+
+            this.getGeminiResponse(userMessage);
+        },
+
+        addMessageToChat(message, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', `${sender}-message`);
+<<<<<<< Updated upstream
+            messageElement.textContent = message;
+=======
+
+            let displayMessage = message;
+            const jsonPart = message.match(/```json\n[\s\S]*?\n```/);
+            if (jsonPart) {
+                displayMessage = message.replace(jsonPart[0], '').trim() || 'Executing command...';
+            }
+
+            messageElement.textContent = displayMessage;
+>>>>>>> Stashed changes
+            this.elements.chatbotMessages.appendChild(messageElement);
+            this.elements.chatbotMessages.scrollTop = this.elements.chatbotMessages.scrollHeight;
+        },
+
+        async getGeminiResponse(prompt) {
+            this.addMessageToChat("Thinking...", 'bot');
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: prompt })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const botResponse = data.message;
+
+                // Remove the "Thinking..." message
+                const thinkingMessage = this.elements.chatbotMessages.lastChild;
+                if (thinkingMessage && thinkingMessage.textContent === "Thinking...") {
+                    this.elements.chatbotMessages.removeChild(thinkingMessage);
+                }
+
+                this.addMessageToChat(botResponse, 'bot');
+
+            } catch (error) {
+                console.error("Error fetching Gemini response:", error);
+                const thinkingMessage = this.elements.chatbotMessages.lastChild;
+                if (thinkingMessage && thinkingMessage.textContent === "Thinking...") {
+                    this.elements.chatbotMessages.removeChild(thinkingMessage);
+                }
+                this.addMessageToChat("Sorry, I encountered an error. Please check the console for details.", 'bot');
+            }
+        },
+
         updateUserInfo() {
             const user = this.getActiveUser();
             if (!user) return;
             this.elements.userName.textContent = user.name;
-            this.elements.userAvatar.textContent = user.name.charAt(0).toUpperCase();
+            if (user.picture) {
+                const img = document.createElement('img');
+                img.src = user.picture;
+                img.alt = user.name;
+                img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
+                this.elements.userAvatar.innerHTML = '';
+                this.elements.userAvatar.appendChild(img);
+            } else {
+                this.elements.userAvatar.textContent = user.name.charAt(0).toUpperCase();
+            }
         },
 
         updateDateTime() {
+            clearInterval(this.state.dateTimeInterval);
             const update = () => {
-                if(this.elements.dateTime) {
+                if (this.elements.dateTime) {
                     this.elements.dateTime.textContent = new Date().toLocaleString();
                 }
             };
             update();
-            setInterval(update, 60000); // Update every minute is enough
+            this.state.dateTimeInterval = setInterval(update, 60000);
         },
 
         updateGreeting() {
@@ -430,6 +624,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
         },
 
+<<<<<<< Updated upstream
+=======
+        // --- Voice Service ---
+        toggleVoice() {
+            if (this.state.isListening) {
+                this.stopListening();
+            } else {
+                this.startListening();
+            }
+        },
+
+        startListening() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                this.showNotification("Speech recognition is not supported in this browser.");
+                return;
+            }
+
+            this.recognition = new SpeechRecognition();
+            this.recognition.lang = 'en-US';
+            this.recognition.interimResults = false;
+            this.recognition.maxAlternatives = 1;
+
+            this.recognition.onstart = () => {
+                this.state.isListening = true;
+                this.elements.voiceBtn.classList.add('listening');
+            };
+
+            this.recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                this.elements.chatbotInput.value = transcript;
+                this.handleChat();
+            };
+
+            this.recognition.onerror = (event) => {
+                console.error("Speech recognition error:", event.error);
+                this.stopListening();
+            };
+
+            this.recognition.onend = () => {
+                this.state.isListening = false;
+                this.elements.voiceBtn.classList.remove('listening');
+            };
+
+            this.recognition.start();
+        },
+
+        stopListening() {
+            this.state.isListening = false;
+            this.elements.voiceBtn.classList.remove('listening');
+            if (this.recognition) {
+                this.recognition.stop();
+            }
+        },
+
+        speak(text) {
+            const speechText = text.replace(/```json[\s\S]*?```/g, '').trim();
+            if (!speechText) return;
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(speechText);
+            utterance.onstart = () => { this.state.isSpeaking = true; };
+            utterance.onend = () => { this.state.isSpeaking = false; };
+            window.speechSynthesis.speak(utterance);
+        },
+
+>>>>>>> Stashed changes
         renderAll() {
             this.renderTasks();
             this.renderNotes();
